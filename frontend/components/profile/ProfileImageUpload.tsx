@@ -59,7 +59,9 @@ export default function ProfileImageUpload({ currentImage, userName, onImageUpda
       if (response.success && response.data) {
         const updatedUser = response.data as User;
         await updateUser({ profileImage: updatedUser.profileImage });
-        onImageUpdate(updatedUser.profileImage);
+        if (updatedUser.profileImage) {
+          onImageUpdate(updatedUser.profileImage);
+        }
         setError(null);
       } else {
         throw new Error(response.message || 'Failed to upload image');
