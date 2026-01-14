@@ -89,18 +89,23 @@ export function PostsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!socket) return;
 
-    const handleNewPost = (notification: { data: Post }) => {
+    const handleNewPost = (notification: { data: any }) => {
       console.log('📢 Received new post via WebSocket:', notification.data);
       const newPost = notification.data;
       
       // Ensure createdAt is a string (in case it comes as Date object)
+      let createdAtString: string;
+      if (typeof newPost.createdAt === 'string') {
+        createdAtString = newPost.createdAt;
+      } else if (newPost.createdAt instanceof Date) {
+        createdAtString = newPost.createdAt.toISOString();
+      } else {
+        createdAtString = new Date().toISOString();
+      }
+      
       const normalizedPost: Post = {
         ...newPost,
-        createdAt: typeof newPost.createdAt === 'string' 
-          ? newPost.createdAt 
-          : newPost.createdAt instanceof Date 
-            ? newPost.createdAt.toISOString() 
-            : new Date().toISOString(),
+        createdAt: createdAtString,
       };
       
       // Check if post already exists (to avoid duplicates)
