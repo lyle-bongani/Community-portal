@@ -5,6 +5,12 @@ import { User, Post, Event, Comment } from './types';
 // For production, set NEXT_PUBLIC_API_URL in Vercel environment variables
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://community-portal-9uek.onrender.com/api/v1';
 
+// Log the API URL being used (only in browser, not during SSR)
+if (typeof window !== 'undefined') {
+  console.log('🔗 API Base URL:', API_BASE_URL);
+  console.log('🔗 Environment variable NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL || 'not set (using default)');
+}
+
 export interface ApiResponse<T> {
   success: boolean;
   data?: T;
@@ -69,7 +75,7 @@ class ApiClient {
     } catch (error: any) {
       // Handle fetch errors (network issues, CORS, etc.)
       if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        const errorMessage = `Failed to connect to server at ${url}. Please ensure the backend server is running on port 5000.`;
+        const errorMessage = `Failed to connect to server at ${url}. Please check your network connection and ensure the backend server is accessible.`;
         console.error(errorMessage, error);
         throw new Error(errorMessage);
       }
@@ -127,6 +133,14 @@ class ApiClient {
 }
 
 export const apiClient = new ApiClient(API_BASE_URL);
+
+// Verify the URL is set correctly
+if (typeof window !== 'undefined') {
+  if (!API_BASE_URL || API_BASE_URL.includes('localhost')) {
+    console.warn('⚠️ API_BASE_URL appears to be using localhost. Make sure NEXT_PUBLIC_API_URL is set correctly in production.');
+  }
+  console.log('✅ API Client initialized with URL:', API_BASE_URL);
+}
 
 // Auth API
 export const authApi = {

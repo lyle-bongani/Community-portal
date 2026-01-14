@@ -34,6 +34,11 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     const socketUrl = process.env.NEXT_PUBLIC_WS_URL 
       || process.env.NEXT_PUBLIC_API_URL?.replace('/api/v1', '') 
       || 'https://community-portal-9uek.onrender.com';
+    
+    console.log('🔌 WebSocket URL:', socketUrl);
+    console.log('🔌 NEXT_PUBLIC_WS_URL:', process.env.NEXT_PUBLIC_WS_URL || 'not set');
+    console.log('🔌 NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL || 'not set');
+    
     const newSocket = io(socketUrl, {
       transports: ['websocket', 'polling'],
     });
