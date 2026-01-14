@@ -20,7 +20,7 @@ router.use(`/${API_VERSION}/events`, eventRoutes);
 router.use(`/${API_VERSION}/admin`, adminRoutes);
 
 // API info endpoint
-router.get('/', (_req, res) => {
+router.get('/', (_req: any, res: any) => {
   res.json({
     message: 'Community Portal API',
     version: API_VERSION,
