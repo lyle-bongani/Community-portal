@@ -117,7 +117,7 @@ export default function ShareModal({ post, onClose }: ShareModalProps) {
           </div>
 
           {/* Native Share (Mobile) */}
-          {navigator.share && (
+          {typeof navigator !== 'undefined' && 'share' in navigator && (
             <button
               onClick={shareViaNative}
               className="w-full flex items-center space-x-3 p-4 bg-zinc-50 hover:bg-zinc-100 rounded-lg transition-colors"
