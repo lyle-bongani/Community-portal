@@ -285,3 +285,110 @@ export const deleteEvent = async (req: AuthRequest, res: Response, next: NextFun
     return next(error);
   }
 };
+
+// POST /api/v1/admin/users/import
+export const importUsers = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const { users: usersToImport } = req.body;
+
+    if (!Array.isArray(usersToImport)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Users must be an array',
+      });
+    }
+
+    await loadUsers();
+
+    const adminEmails = ['lylechadya72@gmail.com', 'admin@gmail.com'];
+    let importedCount = 0;
+    let skippedCount = 0;
+    let updatedCount = 0;
+
+    // Get the maximum ID from existing users
+    const maxId = users.length > 0 
+      ? Math.max(...users.map(u => parseInt(u.id) || 0))
+      : 0;
+
+    for (const userToImport of usersToImport) {
+      const userEmail = (userToImport.email || '').toLowerCase();
+      
+      // Skip admin users - they should be managed by the system
+      if (adminEmails.includes(userEmail)) {
+        skippedCount++;
+        continue;
+      }
+
+      // Check if user already exists by email
+      const existingUserIndex = users.findIndex(
+        u => u.email.toLowerCase() === userEmail
+      );
+
+      if (existingUserIndex !== -1) {
+        // Update existing user but preserve password if it's already hashed
+        const existingUser = users[existingUserIndex];
+        
+        // Only update if password is provided and not already hashed
+        if (userToImport.password && !userToImport.password.startsWith('$2a$')) {
+          // Password is plain text, skip (shouldn't happen but safety check)
+          skippedCount++;
+          continue;
+        }
+
+        // Merge user data, preserving existing password if new one isn't provided
+        users[existingUserIndex] = {
+          ...existingUser,
+          ...userToImport,
+          id: existingUser.id, // Preserve existing ID
+          email: userEmail, // Ensure lowercase
+          password: userToImport.password || existingUser.password, // Preserve password
+          isAdmin: false, // Ensure non-admin users stay non-admin
+          // Preserve login history and count
+          loginCount: existingUser.loginCount || 0,
+          loginHistory: existingUser.loginHistory || [],
+        };
+        updatedCount++;
+      } else {
+        // Create new user
+        // Ensure password is hashed (should be from export)
+        if (!userToImport.password || !userToImport.password.startsWith('$2a$')) {
+          // Skip users without hashed passwords
+          skippedCount++;
+          continue;
+        }
+
+        const newUser = {
+          ...userToImport,
+          id: String(maxId + importedCount + updatedCount + 1),
+          email: userEmail,
+          isAdmin: false, // Ensure new users are not admin
+          createdAt: userToImport.createdAt || new Date().toISOString(),
+          loginCount: userToImport.loginCount || 0,
+          loginHistory: userToImport.loginHistory || [],
+        };
+
+        users.push(newUser);
+        importedCount++;
+      }
+    }
+
+    // Save users
+    await saveUsers();
+
+    // Invalidate cache
+    cacheService.del(cacheKeys.users.all);
+
+    res.status(200).json({
+      success: true,
+      message: 'Users imported successfully',
+      data: {
+        imported: importedCount,
+        updated: updatedCount,
+        skipped: skippedCount,
+        total: users.length,
+      },
+    });
+  } catch (error) {
+    return next(error);
+  }
+};

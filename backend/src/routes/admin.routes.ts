@@ -3,6 +3,7 @@ import { authenticate, requireAdmin } from '../middleware/auth.middleware';
 import {
   getAllUsers,
   deleteUser,
+  importUsers,
   getAllPosts,
   deletePost,
   getAllEvents,
@@ -20,6 +21,7 @@ router.use(requireAdmin);
 // User management
 router.get('/users', getAllUsers);
 router.delete('/users/:id', deleteUser);
+router.post('/users/import', importUsers);
 
 // Post management
 router.get('/posts', getAllPosts);
