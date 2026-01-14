@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { usersApi } from '@/lib/api';
+import { User } from '@/lib/types';
 
 interface ProfileImageUploadProps {
   currentImage?: string;
@@ -56,7 +57,7 @@ export default function ProfileImageUpload({ currentImage, userName, onImageUpda
     try {
       const response = await usersApi.updateProfileImage(user.id, file);
       if (response.success && response.data) {
-        const updatedUser = response.data;
+        const updatedUser = response.data as User;
         await updateUser({ profileImage: updatedUser.profileImage });
         onImageUpdate(updatedUser.profileImage);
         setError(null);

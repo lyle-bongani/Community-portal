@@ -1,3 +1,5 @@
+import { User, Post, Event, Comment } from './types';
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
 
 export interface ApiResponse<T> {
@@ -125,19 +127,19 @@ export const authApi = {
     password: string;
     confirmPassword: string;
     mobileNumber: string;
-  }) => apiClient.post('/auth/register', data),
+  }) => apiClient.post<User>('/auth/register', data),
 
   login: (data: { email: string; password: string }) =>
-    apiClient.post('/auth/login', data),
+    apiClient.post<User>('/auth/login', data),
 };
 
 // Users API
 export const usersApi = {
-  getAll: () => apiClient.get('/users'),
-  getById: (id: string) => apiClient.get(`/users/${id}`),
-  create: (data: any) => apiClient.post('/users', data),
-  update: (id: string, data: any) => apiClient.put(`/users/${id}`, data),
-  delete: (id: string) => apiClient.delete(`/users/${id}`),
+  getAll: () => apiClient.get<User[]>('/users'),
+  getById: (id: string) => apiClient.get<User>(`/users/${id}`),
+  create: (data: any) => apiClient.post<User>('/users', data),
+  update: (id: string, data: any) => apiClient.put<User>(`/users/${id}`, data),
+  delete: (id: string) => apiClient.delete<void>(`/users/${id}`),
   updateProfileImage: async (id: string, image: File) => {
     // Convert image to base64
     const reader = new FileReader();
@@ -146,14 +148,14 @@ export const usersApi = {
       reader.onerror = reject;
       reader.readAsDataURL(image);
     });
-    return apiClient.put(`/users/${id}`, { profileImage: imageUrl });
+    return apiClient.put<User>(`/users/${id}`, { profileImage: imageUrl });
   },
 };
 
 // Posts API
 export const postsApi = {
-  getAll: () => apiClient.get('/posts'),
-  getById: (id: string) => apiClient.get(`/posts/${id}`),
+  getAll: () => apiClient.get<Post[]>('/posts'),
+  getById: (id: string) => apiClient.get<Post>(`/posts/${id}`),
   create: async (data: { title: string; content: string; authorId?: string; image?: File }) => {
     // For now, we'll convert image to base64 or use a placeholder
     // In production, you'd upload to a service like S3 or Cloudinary
@@ -166,57 +168,57 @@ export const postsApi = {
         reader.readAsDataURL(data.image!);
       });
     }
-    return apiClient.post('/posts', {
+    return apiClient.post<Post>('/posts', {
       title: data.title,
       content: data.content,
       ...(data.authorId && { authorId: data.authorId }),
       imageUrl,
     });
   },
-  update: (id: string, data: any) => apiClient.put(`/posts/${id}`, data),
-  delete: (id: string) => apiClient.delete(`/posts/${id}`),
-  like: (id: string) => apiClient.post(`/posts/${id}/like`),
-  save: (id: string) => apiClient.post(`/posts/${id}/save`),
+  update: (id: string, data: any) => apiClient.put<Post>(`/posts/${id}`, data),
+  delete: (id: string) => apiClient.delete<void>(`/posts/${id}`),
+  like: (id: string) => apiClient.post<Post>(`/posts/${id}/like`),
+  save: (id: string) => apiClient.post<Post>(`/posts/${id}/save`),
 };
 
 // Events API
 export const eventsApi = {
-  getAll: () => apiClient.get('/events'),
-  getById: (id: string) => apiClient.get(`/events/${id}`),
-  create: (data: any) => apiClient.post('/events', data),
-  update: (id: string, data: any) => apiClient.put(`/events/${id}`, data),
-  delete: (id: string) => apiClient.delete(`/events/${id}`),
+  getAll: () => apiClient.get<Event[]>('/events'),
+  getById: (id: string) => apiClient.get<Event>(`/events/${id}`),
+  create: (data: any) => apiClient.post<Event>('/events', data),
+  update: (id: string, data: any) => apiClient.put<Event>(`/events/${id}`, data),
+  delete: (id: string) => apiClient.delete<void>(`/events/${id}`),
   register: (eventId: string, userId: string) =>
-    apiClient.post(`/events/${eventId}/register`, { userId }),
+    apiClient.post<Event>(`/events/${eventId}/register`, { userId }),
 };
 
 // Comments API
 export const commentsApi = {
   getAll: (postId?: string) => {
     const query = postId ? `?postId=${postId}` : '';
-    return apiClient.get(`/comments${query}`);
+    return apiClient.get<Comment[]>(`/comments${query}`);
   },
-  getById: (id: string) => apiClient.get(`/comments/${id}`),
-  create: (data: { content: string; postId: string }) => apiClient.post('/comments', data),
-  update: (id: string, data: { content: string }) => apiClient.put(`/comments/${id}`, data),
-  delete: (id: string) => apiClient.delete(`/comments/${id}`),
+  getById: (id: string) => apiClient.get<Comment>(`/comments/${id}`),
+  create: (data: { content: string; postId: string }) => apiClient.post<Comment>('/comments', data),
+  update: (id: string, data: { content: string }) => apiClient.put<Comment>(`/comments/${id}`, data),
+  delete: (id: string) => apiClient.delete<void>(`/comments/${id}`),
 };
 
 // Admin API
 export const adminApi = {
   // Users
-  getUsers: () => apiClient.get('/admin/users'),
-  deleteUser: (id: string) => apiClient.delete(`/admin/users/${id}`),
+  getUsers: () => apiClient.get<User[]>('/admin/users'),
+  deleteUser: (id: string) => apiClient.delete<void>(`/admin/users/${id}`),
   
   // Posts
-  getPosts: () => apiClient.get('/admin/posts'),
-  deletePost: (id: string) => apiClient.delete(`/admin/posts/${id}`),
+  getPosts: () => apiClient.get<Post[]>('/admin/posts'),
+  deletePost: (id: string) => apiClient.delete<void>(`/admin/posts/${id}`),
   
   // Events
-  getEvents: () => apiClient.get('/admin/events'),
+  getEvents: () => apiClient.get<Event[]>('/admin/events'),
   createEvent: (data: { title: string; description: string; date: string; location: string; maxAttendees: number }) => 
-    apiClient.post('/admin/events', data),
+    apiClient.post<Event>('/admin/events', data),
   updateEvent: (id: string, data: { title?: string; description?: string; date?: string; location?: string; maxAttendees?: number }) => 
-    apiClient.put(`/admin/events/${id}`, data),
-  deleteEvent: (id: string) => apiClient.delete(`/admin/events/${id}`),
+    apiClient.put<Event>(`/admin/events/${id}`, data),
+  deleteEvent: (id: string) => apiClient.delete<void>(`/admin/events/${id}`),
 };
