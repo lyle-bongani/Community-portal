@@ -4,9 +4,29 @@ import { Server as SocketIOServer, Socket } from 'socket.io';
 let io: SocketIOServer | null = null;
 
 export const initializeWebSocket = (httpServer: HttpServer) => {
+  // CORS configuration - supports multiple origins (same as main server)
+  const NODE_ENV = process.env.NODE_ENV || 'development';
+  const defaultCorsOrigin = NODE_ENV === 'production' 
+    ? 'https://community-portal-blue.vercel.app'
+    : 'http://localhost:3000';
+  const corsOrigin = process.env.CORS_ORIGIN || defaultCorsOrigin;
+  const allowedOrigins = corsOrigin.includes(',') 
+    ? corsOrigin.split(',').map(origin => origin.trim())
+    : [corsOrigin];
+
   io = new SocketIOServer(httpServer, {
     cors: {
-      origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+      origin: (origin, callback) => {
+        // Allow requests with no origin
+        if (!origin) return callback(null, true);
+        
+        // Check if origin is in allowed list
+        if (allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
+      },
       methods: ['GET', 'POST'],
       credentials: true,
     },

@@ -19,11 +19,16 @@ const httpServer = createServer(app);
 const PORT = process.env.PORT || 5000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
+// In production, allow requests from Vercel frontend by default if CORS_ORIGIN not set
+const defaultCorsOrigin = NODE_ENV === 'production' 
+  ? 'https://community-portal-blue.vercel.app'
+  : 'http://localhost:3000';
+
 // Middleware
 app.use(helmet()); // Security headers
 
 // CORS configuration - supports multiple origins
-const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:3000';
+const corsOrigin = process.env.CORS_ORIGIN || defaultCorsOrigin;
 const allowedOrigins = corsOrigin.includes(',') 
   ? corsOrigin.split(',').map(origin => origin.trim())
   : [corsOrigin];
