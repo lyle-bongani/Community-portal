@@ -1,4 +1,4 @@
-import express, { Application, Request, Response, NextFunction } from 'express';
+import express, { Application, Request, Response } from 'express';
 import { createServer } from 'http';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -21,8 +21,25 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // Middleware
 app.use(helmet()); // Security headers
+
+// CORS configuration - supports multiple origins
+const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:3000';
+const allowedOrigins = corsOrigin.includes(',') 
+  ? corsOrigin.split(',').map(origin => origin.trim())
+  : [corsOrigin];
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Check if origin is in allowed list
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
 }));
 app.use(performanceMonitor); // Performance monitoring
@@ -31,7 +48,7 @@ app.use(express.json({ limit: '10gb' })); // Parse JSON bodies - 10GB limit for 
 app.use(express.urlencoded({ extended: true, limit: '10gb' })); // Parse URL-encoded bodies - 10GB limit
 
 // Health check endpoint
-app.get('/health', (req: Request, res: Response) => {
+app.get('/health', (_req: Request, res: Response) => {
   res.status(200).json({
     status: 'ok',
     message: 'Server is running',
@@ -57,8 +74,13 @@ const startServer = async () => {
   // Start server
   httpServer.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT} in ${NODE_ENV} mode`);
-    console.log(`📍 Health check: http://localhost:${PORT}/health`);
-    console.log(`📍 API endpoint: http://localhost:${PORT}/api`);
+    if (NODE_ENV === 'development') {
+      console.log(`📍 Health check: http://localhost:${PORT}/health`);
+      console.log(`📍 API endpoint: http://localhost:${PORT}/api`);
+    } else {
+      console.log(`📍 Health check: https://your-backend-url.com/health`);
+      console.log(`📍 API endpoint: https://your-backend-url.com/api`);
+    }
     console.log(`🔌 WebSocket ready for real-time updates`);
   });
 };

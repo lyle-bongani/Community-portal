@@ -234,7 +234,13 @@ npm install
 If your backend is running on a different URL, create a `.env.local` file:
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:5000
+# For local development
+NEXT_PUBLIC_API_URL=http://localhost:5000/api/v1
+NEXT_PUBLIC_WS_URL=http://localhost:5000
+
+# For production (set in Vercel environment variables, or defaults to Render URL)
+# NEXT_PUBLIC_API_URL=https://community-portal-9uek.onrender.com/api/v1
+# NEXT_PUBLIC_WS_URL=https://community-portal-9uek.onrender.com
 ```
 
 ### Step 4: Run Development Server
@@ -398,7 +404,11 @@ Default admin account for testing:
 
 ## Notes
 
-- The frontend expects the backend to be running on `http://localhost:5000` by default
+- **Local Development**: The frontend expects the backend to be running on `http://localhost:5000` by default
+- **Production**: Defaults to Render backend URL (`https://community-portal-9uek.onrender.com`)
+  - Can be overridden by setting `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_WS_URL` in Vercel environment variables
+  - Default API URL: `https://community-portal-9uek.onrender.com/api/v1`
+  - Default WebSocket URL: `https://community-portal-9uek.onrender.com`
 - Profile images are stored as base64 strings (consider cloud storage for production)
 - WebSocket connection is established automatically on app load
 - LocalStorage is used for session management (consider more secure options for production)

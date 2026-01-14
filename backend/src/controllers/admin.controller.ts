@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { users, loadUsers, saveUsers } from './auth.controller';
 import { database } from '../services/database.service';
@@ -31,7 +31,7 @@ loadPosts();
 loadEvents();
 
 // GET /api/v1/admin/users
-export const getAllUsers = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const getAllUsers = async (_req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     await loadUsers();
     
@@ -44,7 +44,7 @@ export const getAllUsers = async (req: AuthRequest, res: Response, next: NextFun
       data: usersWithoutPasswords,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -84,12 +84,12 @@ export const deleteUser = async (req: AuthRequest, res: Response, next: NextFunc
       message: 'User deleted successfully',
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
 // GET /api/v1/admin/posts
-export const getAllPosts = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const getAllPosts = async (_req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     await loadPosts();
     
@@ -115,7 +115,7 @@ export const getAllPosts = async (req: AuthRequest, res: Response, next: NextFun
       data: postsWithAuthors,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -147,12 +147,12 @@ export const deletePost = async (req: AuthRequest, res: Response, next: NextFunc
       message: 'Post deleted successfully',
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
 // GET /api/v1/admin/events
-export const getAllEvents = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const getAllEvents = async (_req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     await loadEvents();
 
@@ -162,7 +162,7 @@ export const getAllEvents = async (req: AuthRequest, res: Response, next: NextFu
       data: events,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -208,7 +208,7 @@ export const createEvent = async (req: AuthRequest, res: Response, next: NextFun
       data: newEvent,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -251,7 +251,7 @@ export const updateEvent = async (req: AuthRequest, res: Response, next: NextFun
       data: events[eventIndex],
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -282,6 +282,6 @@ export const deleteEvent = async (req: AuthRequest, res: Response, next: NextFun
       message: 'Event deleted successfully',
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };

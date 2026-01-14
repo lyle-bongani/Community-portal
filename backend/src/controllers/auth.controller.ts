@@ -188,7 +188,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       token, // Include token in response
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -269,6 +269,6 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       token, // Include token in response
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };

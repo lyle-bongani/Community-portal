@@ -7,10 +7,10 @@ export interface AppError extends Error {
 }
 
 export const errorHandler = (
-  err: AppError,
-  req: Request,
+  err: AppError & { type?: string },
+  _req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ) => {
   // Handle "Request Entity Too Large" error
   if (err.message && err.message.includes('request entity too large')) {
@@ -33,7 +33,7 @@ export const errorHandler = (
   const statusCode = err.statusCode || 500;
   const status = err.status || 'error';
 
-  res.status(statusCode).json({
+  return res.status(statusCode).json({
     success: false,
     status,
     message: err.message || 'Internal Server Error',

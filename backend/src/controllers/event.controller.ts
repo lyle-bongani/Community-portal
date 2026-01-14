@@ -38,7 +38,7 @@ const saveEvents = async () => {
 loadEvents();
 
 // GET /api/v1/events
-export const getEvents = async (req: Request, res: Response, next: NextFunction) => {
+export const getEvents = async (_req: Request, res: Response, next: NextFunction) => {
   try {
     // Reload from database to get latest data
     await loadEvents();
@@ -55,7 +55,7 @@ export const getEvents = async (req: Request, res: Response, next: NextFunction)
       data: events,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -94,7 +94,7 @@ export const getEventById = async (req: Request, res: Response, next: NextFuncti
       data: event,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -136,7 +136,7 @@ export const createEvent = async (req: AuthRequest, res: Response, next: NextFun
       data: newEvent,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -177,7 +177,7 @@ export const updateEvent = async (req: AuthRequest, res: Response, next: NextFun
       data: events[eventIndex],
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -209,7 +209,7 @@ export const deleteEvent = async (req: AuthRequest, res: Response, next: NextFun
       message: `Event with id ${id} deleted successfully`,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -310,6 +310,6 @@ export const registerForEvent = async (req: AuthRequest, res: Response, next: Ne
       data: event,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };

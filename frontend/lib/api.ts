@@ -1,6 +1,9 @@
 import { User, Post, Event, Comment } from './types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+// API Base URL - uses environment variable or defaults to production Render URL
+// For local development, set NEXT_PUBLIC_API_URL=http://localhost:5000/api/v1 in .env.local
+// For production, set NEXT_PUBLIC_API_URL in Vercel environment variables
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://community-portal-9uek.onrender.com/api/v1';
 
 export interface ApiResponse<T> {
   success: boolean;
@@ -20,6 +23,12 @@ class ApiClient {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
+    if (!this.baseURL) {
+      const errorMessage = 'API URL not configured. Please set NEXT_PUBLIC_API_URL environment variable.';
+      console.error(errorMessage);
+      throw new Error(errorMessage);
+    }
+    
     const url = `${this.baseURL}${endpoint}`;
     
     // Get token from localStorage for authenticated requests

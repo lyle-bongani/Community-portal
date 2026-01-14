@@ -5,8 +5,8 @@ export const performanceMonitor = (req: Request, res: Response, next: NextFuncti
   const startTime = Date.now();
 
   // Override res.end to measure response time
-  const originalEnd = res.end;
-  res.end = function (chunk?: any, encoding?: any) {
+  const originalEnd = res.end.bind(res);
+  res.end = function (chunk?: any, encoding?: any, cb?: () => void) {
     const duration = Date.now() - startTime;
     
     // Log slow requests in development
@@ -18,7 +18,13 @@ export const performanceMonitor = (req: Request, res: Response, next: NextFuncti
     res.setHeader('X-Response-Time', `${duration}ms`);
     
     // Call original end
-    originalEnd.call(this, chunk, encoding);
+    if (typeof chunk === 'function') {
+      return originalEnd(chunk);
+    } else if (typeof encoding === 'function') {
+      return originalEnd(chunk, encoding);
+    } else {
+      return originalEnd(chunk, encoding, cb);
+    }
   };
 
   next();

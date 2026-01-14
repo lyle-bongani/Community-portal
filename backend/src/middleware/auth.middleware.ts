@@ -72,7 +72,7 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
       ...decoded,
       isAdmin: isAdmin,
     };
-    next();
+    return next();
   } catch (error) {
     return res.status(401).json({
       success: false,
@@ -82,7 +82,7 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
 };
 
 // Optional authentication (doesn't fail if no token)
-export const optionalAuth = (req: AuthRequest, res: Response, next: NextFunction) => {
+export const optionalAuth = (req: AuthRequest, _res: Response, next: NextFunction) => {
   try {
     const authHeader = req.headers.authorization;
     
@@ -118,7 +118,7 @@ export const authorize = (resourceUserId: string) => {
       });
     }
 
-    next();
+    return next();
   };
 };
 
@@ -149,5 +149,5 @@ export const requireAdmin = async (req: AuthRequest, res: Response, next: NextFu
 
   // Update req.user with latest admin status
   req.user.isAdmin = true;
-  next();
+  return next();
 };

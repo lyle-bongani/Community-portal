@@ -54,7 +54,7 @@ const enrichPostWithAuthor = (post: any) => {
 };
 
 // GET /api/v1/posts
-export const getPosts = async (req: Request, res: Response, next: NextFunction) => {
+export const getPosts = async (_req: Request, res: Response, next: NextFunction) => {
   try {
     // Check cache first
     const cachedPosts = cacheService.get(cacheKeys.posts.all);
@@ -79,7 +79,7 @@ export const getPosts = async (req: Request, res: Response, next: NextFunction) 
       data: postsWithAuthors,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -121,7 +121,7 @@ export const getPostById = async (req: Request, res: Response, next: NextFunctio
       data: postWithAuthor,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -168,7 +168,7 @@ export const createPost = async (req: AuthRequest, res: Response, next: NextFunc
       data: postWithAuthor,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -219,7 +219,7 @@ export const updatePost = async (req: AuthRequest, res: Response, next: NextFunc
       data: postWithAuthor,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -260,7 +260,7 @@ export const deletePost = async (req: AuthRequest, res: Response, next: NextFunc
       message: `Post with id ${id} deleted successfully`,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -322,7 +322,7 @@ export const toggleLike = async (req: AuthRequest, res: Response, next: NextFunc
       liked: post.likes.includes(userId),
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -384,6 +384,6 @@ export const toggleSave = async (req: AuthRequest, res: Response, next: NextFunc
       saved: post.savedBy.includes(userId),
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };

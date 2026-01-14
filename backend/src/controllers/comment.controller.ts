@@ -70,7 +70,7 @@ export const getComments = async (req: Request, res: Response, next: NextFunctio
       data: commentsWithAuthors,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -92,7 +92,7 @@ export const getCommentById = async (req: Request, res: Response, next: NextFunc
       data: comment,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -139,7 +139,7 @@ export const createComment = async (req: AuthRequest, res: Response, next: NextF
       data: commentWithAuthor,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -186,7 +186,7 @@ export const updateComment = async (req: AuthRequest, res: Response, next: NextF
       data: commentWithAuthor,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -225,6 +225,6 @@ export const deleteComment = async (req: AuthRequest, res: Response, next: NextF
       message: `Comment with id ${id} deleted successfully`,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };

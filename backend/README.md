@@ -203,14 +203,26 @@ npm start
 
 The server will start on `http://localhost:5000` (or the port specified in your `.env` file).
 
+**Production URL**: `https://community-portal-9uek.onrender.com`
+
+**Note**: For production deployment, update `CORS_ORIGIN` in your `.env` file to include your frontend URL (e.g., `https://community-portal-blue.vercel.app`). You can also set multiple origins separated by commas.
+
 ## Testing the Server
+
+> **Note**: The examples below use `http://localhost:5000` for local development. For production, replace with your production backend URL (e.g., `https://your-backend-url.com`).
 
 ### 1. Verify Server is Running
 
 Check if the server is running by accessing the health check endpoint:
 
+**Local Development:**
 ```bash
 curl http://localhost:5000/health
+```
+
+**Production:**
+```bash
+curl https://your-backend-url.com/health
 ```
 
 Expected response:
@@ -359,7 +371,9 @@ socket.on('new-event', (data) => {
 For easier testing, you can use API clients like Postman or Insomnia:
 
 1. **Import Collection**: Create a new collection
-2. **Set Base URL**: `http://localhost:5000`
+2. **Set Base URL**: 
+   - Local: `http://localhost:5000`
+   - Production: `https://your-backend-url.com`
 3. **Authentication**: 
    - Login first to get a token
    - Add token to request headers: `Authorization: Bearer YOUR_TOKEN`

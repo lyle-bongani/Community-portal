@@ -7,7 +7,7 @@ import { cacheService, cacheKeys } from '../services/cache.service';
 // In production, this would be a database
 
 // GET /api/v1/users
-export const getUsers = async (req: Request, res: Response, next: NextFunction) => {
+export const getUsers = async (_req: Request, res: Response, next: NextFunction) => {
   try {
     // Check cache first
     const cachedUsers = cacheService.get(cacheKeys.users.all);
@@ -32,7 +32,7 @@ export const getUsers = async (req: Request, res: Response, next: NextFunction) 
       data: usersWithoutPasswords,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -78,7 +78,7 @@ export const getUserById = async (req: Request, res: Response, next: NextFunctio
       data: userWithoutPassword,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -138,7 +138,7 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
       data: userResponse,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -187,7 +187,7 @@ export const updateUser = async (req: AuthRequest, res: Response, next: NextFunc
       data: userResponse,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -226,6 +226,6 @@ export const deleteUser = async (req: AuthRequest, res: Response, next: NextFunc
       message: `User with id ${id} deleted successfully`,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };

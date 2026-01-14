@@ -253,9 +253,15 @@ cd frontend
 npm install
 ```
 
-3. (Optional) Create `.env.local` file if backend is on different URL:
+3. (Optional) Create `.env.local` file for local development:
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:5000
+# For local development
+NEXT_PUBLIC_API_URL=http://localhost:5000/api/v1
+NEXT_PUBLIC_WS_URL=http://localhost:5000
+
+# For production (set in Vercel environment variables, or defaults to Render URL)
+# NEXT_PUBLIC_API_URL=https://community-portal-9uek.onrender.com/api/v1
+# NEXT_PUBLIC_WS_URL=https://community-portal-9uek.onrender.com
 ```
 
 ## Running the Application
@@ -473,7 +479,11 @@ Data is stored in JSON files in the `backend/data/` directory:
 - WebSocket connections are managed via Socket.IO for real-time features
 
 ### Frontend
-- The frontend expects the backend to be running on `http://localhost:5000` by default
+- **Local Development**: The frontend expects the backend to be running on `http://localhost:5000` by default
+- **Production**: Defaults to Render backend URL (`https://community-portal-9uek.onrender.com`)
+  - Can be overridden by setting `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_WS_URL` in Vercel environment variables
+  - Default API URL: `https://community-portal-9uek.onrender.com/api/v1`
+  - Default WebSocket URL: `https://community-portal-9uek.onrender.com`
 - Profile images are stored as base64 strings (consider cloud storage for production)
 - WebSocket connection is established automatically on app load
 - LocalStorage is used for session management (consider more secure options for production)
@@ -491,8 +501,10 @@ Data is stored in JSON files in the `backend/data/` directory:
 1. Build the application: `npm run build`
 2. Start production server: `npm start`
 3. Ensure backend API is accessible
-4. Configure environment variables
-5. Set up proper CORS on backend
+4. Configure environment variables in Vercel:
+   - `NEXT_PUBLIC_API_URL`: Your backend API URL (e.g., `https://your-backend-url.com/api/v1`)
+   - `NEXT_PUBLIC_WS_URL`: Your WebSocket server URL (e.g., `https://your-backend-url.com`)
+5. Set up proper CORS on backend to allow your frontend domain (e.g., `https://community-portal-blue.vercel.app`)
 
 ## License
 

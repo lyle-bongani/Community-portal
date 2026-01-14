@@ -28,7 +28,12 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     // Only connect in browser environment
     if (typeof window === 'undefined') return;
 
-    const socketUrl = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:5000';
+    // WebSocket URL - defaults to API URL if WS_URL not set
+    // For local development, set NEXT_PUBLIC_WS_URL=http://localhost:5000 in .env.local
+    // For production, defaults to Render URL
+    const socketUrl = process.env.NEXT_PUBLIC_WS_URL 
+      || process.env.NEXT_PUBLIC_API_URL?.replace('/api/v1', '') 
+      || 'https://community-portal-9uek.onrender.com';
     const newSocket = io(socketUrl, {
       transports: ['websocket', 'polling'],
     });
