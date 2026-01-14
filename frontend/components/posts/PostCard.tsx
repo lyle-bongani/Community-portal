@@ -37,9 +37,9 @@ export default function PostCard({ post, onEdit, onDelete, canEdit, onUpdate }: 
     try {
       const response = await postsApi.like(localPost.id);
       if (response.success && response.data) {
-        setLocalPost(response.data);
+        setLocalPost(response.data as Post);
         if (onUpdate) {
-          onUpdate(response.data);
+          onUpdate(response.data as Post);
         }
       }
     } catch (error) {
@@ -56,9 +56,9 @@ export default function PostCard({ post, onEdit, onDelete, canEdit, onUpdate }: 
     try {
       const response = await postsApi.save(localPost.id);
       if (response.success && response.data) {
-        setLocalPost(response.data);
+        setLocalPost(response.data as Post);
         if (onUpdate) {
-          onUpdate(response.data);
+          onUpdate(response.data as Post);
         }
       }
     } catch (error) {
