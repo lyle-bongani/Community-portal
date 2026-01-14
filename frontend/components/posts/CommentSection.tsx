@@ -46,7 +46,7 @@ export default function CommentSection({ postId }: CommentSectionProps) {
       });
       if (response.success && response.data) {
         // Add the new comment to the list
-        setComments([response.data, ...comments]);
+        setComments([response.data as Comment, ...comments]);
         setNewComment('');
       }
     } catch (error: any) {
