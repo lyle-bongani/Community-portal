@@ -481,6 +481,7 @@ Data is stored in JSON files in the `backend/data/` directory:
 ### Frontend
 - **Local Development**: The frontend expects the backend to be running on `http://localhost:5000` by default
 - **Production**: Defaults to Render backend URL (`https://community-portal-9uek.onrender.com`)
+  - Frontend is deployed at: `https://www.communityportal.online`
   - Can be overridden by setting `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_WS_URL` in Vercel environment variables
   - Default API URL: `https://community-portal-9uek.onrender.com/api/v1`
   - Default WebSocket URL: `https://community-portal-9uek.onrender.com`
@@ -504,7 +505,7 @@ Data is stored in JSON files in the `backend/data/` directory:
 4. Configure environment variables in Vercel:
    - `NEXT_PUBLIC_API_URL`: Your backend API URL (e.g., `https://your-backend-url.com/api/v1`)
    - `NEXT_PUBLIC_WS_URL`: Your WebSocket server URL (e.g., `https://your-backend-url.com`)
-5. Set up proper CORS on backend to allow your frontend domain (e.g., `https://community-portal-blue.vercel.app`)
+5. Set up proper CORS on backend to allow your frontend domain (e.g., `https://www.communityportal.online`)
 
 ## License
 

@@ -204,7 +204,7 @@ The server will start on `http://localhost:5000` (or the port specified in your 
 
 **Production URL**: `https://community-portal-9uek.onrender.com`
 
-**Note**: For production deployment, update `CORS_ORIGIN` in your `.env` file to include your frontend URL (e.g., `https://community-portal-blue.vercel.app`). You can also set multiple origins separated by commas.
+**Note**: For production deployment, update `CORS_ORIGIN` in your `.env` file to include your frontend URL (e.g., `https://www.communityportal.online`). You can also set multiple origins separated by commas.
 
 ## Testing the Server
 

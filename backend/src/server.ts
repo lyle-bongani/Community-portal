@@ -19,9 +19,9 @@ const httpServer = createServer(app);
 const PORT = process.env.PORT || 5000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
-// In production, allow requests from Vercel frontend by default if CORS_ORIGIN not set
+// In production, allow requests from frontend by default if CORS_ORIGIN not set
 const defaultCorsOrigin = NODE_ENV === 'production' 
-  ? 'https://community-portal-blue.vercel.app'
+  ? 'https://www.communityportal.online'
   : 'http://localhost:3000';
 
 // Middleware

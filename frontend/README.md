@@ -239,6 +239,7 @@ NEXT_PUBLIC_API_URL=http://localhost:5000/api/v1
 NEXT_PUBLIC_WS_URL=http://localhost:5000
 
 # For production (set in Vercel environment variables, or defaults to Render URL)
+# Frontend URL: https://www.communityportal.online
 # NEXT_PUBLIC_API_URL=https://community-portal-9uek.onrender.com/api/v1
 # NEXT_PUBLIC_WS_URL=https://community-portal-9uek.onrender.com
 ```
@@ -405,7 +406,9 @@ Default admin account for testing:
 ## Notes
 
 - **Local Development**: The frontend expects the backend to be running on `http://localhost:5000` by default
-- **Production**: Defaults to Render backend URL (`https://community-portal-9uek.onrender.com`)
+- **Production**: 
+  - Frontend URL: `https://www.communityportal.online`
+  - Backend URL: `https://community-portal-9uek.onrender.com` (default)
   - Can be overridden by setting `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_WS_URL` in Vercel environment variables
   - Default API URL: `https://community-portal-9uek.onrender.com/api/v1`
   - Default WebSocket URL: `https://community-portal-9uek.onrender.com`

@@ -30,25 +30,25 @@ export default function LandingFeatures() {
   ];
 
   return (
-    <section id="features" className="bg-white py-20 sm:py-24 lg:py-32">
+    <section id="features" className="bg-white py-12 sm:py-16 md:py-20 lg:py-24 xl:py-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-zinc-900 mb-4">
+        <div className="text-center mb-10 sm:mb-12 md:mb-14 lg:mb-16">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-zinc-900 mb-3 sm:mb-4 px-2">
             Powerful Features
           </h2>
-          <p className="text-lg sm:text-xl text-zinc-600 max-w-3xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl text-zinc-600 max-w-3xl mx-auto px-2">
             Everything you need to stay connected and engaged with your community
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 md:gap-8">
           {features.map((feature, index) => (
-            <div key={index} className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-200 text-left border border-zinc-100">
-              <div className="w-12 h-12 bg-[#7BA09F]/10 rounded-lg flex items-center justify-center mb-4">
+            <div key={index} className="bg-white rounded-xl p-6 sm:p-7 md:p-8 shadow-lg hover:shadow-xl transition-shadow duration-200 text-left border border-zinc-100">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#7BA09F]/10 rounded-lg flex items-center justify-center mb-3 sm:mb-4">
                 {feature.icon}
               </div>
-              <h3 className="text-xl font-bold text-zinc-900 mb-2 text-left">{feature.title}</h3>
-              <p className="text-zinc-600 text-left leading-relaxed">{feature.description}</p>
+              <h3 className="text-lg sm:text-xl font-bold text-zinc-900 mb-2 text-left">{feature.title}</h3>
+              <p className="text-sm sm:text-base text-zinc-600 text-left leading-relaxed">{feature.description}</p>
             </div>
           ))}
         </div>

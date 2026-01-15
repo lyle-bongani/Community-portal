@@ -25,7 +25,7 @@ export default function LandingHeader() {
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className={`flex justify-between items-center transition-all duration-300 ${
-          isScrolled ? 'h-14' : 'h-20 sm:h-24'
+          isScrolled ? 'h-12 sm:h-14' : 'h-16 sm:h-18 md:h-20 lg:h-24'
         }`}>
           <div className="flex items-center">
             <Link href="/" className="flex items-center group">
@@ -33,9 +33,9 @@ export default function LandingHeader() {
                 <Image 
                   src="/images/logo.png" 
                   alt="Community Portal Logo" 
-                  width={isScrolled ? 80 : 100}
-                  height={isScrolled ? 80 : 100}
-                  className="object-contain transition-all duration-300 brightness-0 invert"
+                  width={isScrolled ? 60 : 80}
+                  height={isScrolled ? 60 : 80}
+                  className="object-contain transition-all duration-300 brightness-0 invert w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-20 lg:h-20"
                   priority
                 />
               </div>

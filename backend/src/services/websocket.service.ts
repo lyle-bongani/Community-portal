@@ -7,7 +7,7 @@ export const initializeWebSocket = (httpServer: HttpServer) => {
   // CORS configuration - supports multiple origins (same as main server)
   const NODE_ENV = process.env.NODE_ENV || 'development';
   const defaultCorsOrigin = NODE_ENV === 'production' 
-    ? 'https://community-portal-blue.vercel.app'
+    ? 'https://www.communityportal.online'
     : 'http://localhost:3000';
   const corsOrigin = process.env.CORS_ORIGIN || defaultCorsOrigin;
   const allowedOrigins = corsOrigin.includes(',') 
