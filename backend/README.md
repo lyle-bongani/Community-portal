@@ -135,7 +135,6 @@ backend/
 │   │   ├── cache.service.ts
 │   │   ├── database.service.ts
 │   │   ├── email.service.ts
-│   │   ├── sms.service.ts
 │   │   └── websocket.service.ts
 │   ├── utils/             # Utility functions
 │   │   └── password.util.ts
