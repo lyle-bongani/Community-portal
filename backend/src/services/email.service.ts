@@ -6,11 +6,9 @@ import nodemailer from 'nodemailer';
 // For local development, SMTP works fine
 
 const createTransporter = () => {
-  // Check if using API-based email service (for Render free tier)
-  if (process.env.EMAIL_API_KEY && process.env.EMAIL_API_URL) {
-    // Use API-based email service (SendGrid, Mailgun, Resend, etc.)
-    // This works on Render free tier since it uses HTTPS, not SMTP ports
-    return null; // Will use fetch API instead
+  // Don't create SMTP transporter if API key is set (API takes priority)
+  if (process.env.EMAIL_API_KEY) {
+    return null; // Will use API instead
   }
 
   // Use SMTP (works locally, but blocked on Render free tier)
@@ -70,11 +68,13 @@ export interface EmailOptions {
 }
 
 export const sendEmail = async (options: EmailOptions): Promise<boolean> => {
-  // Check if using API-based email service (for Render free tier)
-  if (process.env.EMAIL_API_KEY && process.env.EMAIL_API_URL) {
+  // Check if using API-based email service (for Render free tier) - PRIORITY CHECK
+  if (process.env.EMAIL_API_KEY) {
+    console.log('📧 Using API-based email service (Render-compatible)');
     return sendEmailViaAPI(options);
   }
 
+  // Fallback to SMTP (only if API key not set)
   const transporter = createTransporter();
   
   // If no email configured, just log the email
@@ -86,7 +86,7 @@ export const sendEmail = async (options: EmailOptions): Promise<boolean> => {
     console.log('📧 Content Preview:', textContent.substring(0, 300) + (textContent.length > 300 ? '...' : ''));
     console.log('📧 ====================================================\n');
     console.log('💡 To enable email sending:');
-    console.log('   - For Render free tier: Use API-based service (EMAIL_API_KEY, EMAIL_API_URL)');
+    console.log('   - For Render free tier: Set EMAIL_SERVICE and EMAIL_API_KEY');
     console.log('   - For local/paid Render: Configure SMTP settings (SMTP_HOST, SMTP_USER, SMTP_PASS)');
     return true; // Return true to not break the flow
   }
