@@ -1,12 +1,17 @@
 import fs from 'fs-extra';
 import path from 'path';
 
-// Database directory
-const DB_DIR = path.join(process.cwd(), 'data');
+// Database directory - use environment variable or default to 'data' in project root
+// For Render, you can set DATA_DIR to a persistent path or use Render's disk storage
+const DB_DIR = process.env.DATA_DIR || path.join(process.cwd(), 'data');
 const USERS_FILE = path.join(DB_DIR, 'users.json');
 const POSTS_FILE = path.join(DB_DIR, 'posts.json');
 const EVENTS_FILE = path.join(DB_DIR, 'events.json');
 const COMMENTS_FILE = path.join(DB_DIR, 'comments.json');
+
+// Log database directory on startup
+console.log('📁 Database directory:', DB_DIR);
+console.log('📁 Database directory exists:', fs.existsSync(DB_DIR));
 
 // Ensure database directory exists
 const ensureDbDir = async () => {
@@ -92,7 +97,13 @@ export const database = {
 
     async write(data: any[]): Promise<void> {
       await ensureDbDir();
-      await fs.writeJSON(USERS_FILE, data, { spaces: 2 });
+      try {
+        await fs.writeJSON(USERS_FILE, data, { spaces: 2 });
+        console.log(`✅ Successfully saved ${data.length} users to ${USERS_FILE}`);
+      } catch (error: any) {
+        console.error(`❌ Failed to save users to ${USERS_FILE}:`, error.message);
+        throw error;
+      }
     },
   },
 
@@ -108,7 +119,13 @@ export const database = {
 
     async write(data: any[]): Promise<void> {
       await ensureDbDir();
-      await fs.writeJSON(POSTS_FILE, data, { spaces: 2 });
+      try {
+        await fs.writeJSON(POSTS_FILE, data, { spaces: 2 });
+        console.log(`✅ Successfully saved ${data.length} posts to ${POSTS_FILE}`);
+      } catch (error: any) {
+        console.error(`❌ Failed to save posts to ${POSTS_FILE}:`, error.message);
+        throw error;
+      }
     },
   },
 
@@ -124,7 +141,13 @@ export const database = {
 
     async write(data: any[]): Promise<void> {
       await ensureDbDir();
-      await fs.writeJSON(EVENTS_FILE, data, { spaces: 2 });
+      try {
+        await fs.writeJSON(EVENTS_FILE, data, { spaces: 2 });
+        console.log(`✅ Successfully saved ${data.length} events to ${EVENTS_FILE}`);
+      } catch (error: any) {
+        console.error(`❌ Failed to save events to ${EVENTS_FILE}:`, error.message);
+        throw error;
+      }
     },
   },
 
@@ -140,7 +163,13 @@ export const database = {
 
     async write(data: any[]): Promise<void> {
       await ensureDbDir();
-      await fs.writeJSON(COMMENTS_FILE, data, { spaces: 2 });
+      try {
+        await fs.writeJSON(COMMENTS_FILE, data, { spaces: 2 });
+        console.log(`✅ Successfully saved ${data.length} comments to ${COMMENTS_FILE}`);
+      } catch (error: any) {
+        console.error(`❌ Failed to save comments to ${COMMENTS_FILE}:`, error.message);
+        throw error;
+      }
     },
   },
 };

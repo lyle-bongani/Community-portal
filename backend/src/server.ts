@@ -70,6 +70,17 @@ app.use(errorHandler);
 
 // Initialize database and WebSocket
 const startServer = async () => {
+  // Check email configuration
+  const hasEmailConfig = !!(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
+  if (hasEmailConfig) {
+    console.log('📧 Email service: CONFIGURED (SMTP enabled)');
+    console.log(`📧 SMTP Host: ${process.env.SMTP_HOST}`);
+    console.log(`📧 SMTP User: ${process.env.SMTP_USER}`);
+  } else {
+    console.log('📧 Email service: NOT CONFIGURED (emails will be logged only)');
+    console.log('💡 To enable email sending, set SMTP_HOST, SMTP_USER, and SMTP_PASS environment variables');
+  }
+
   // Initialize database
   await database.init();
 

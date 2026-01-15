@@ -3,6 +3,8 @@ import { hashPassword, comparePassword } from '../utils/password.util';
 import { generateToken } from '../middleware/auth.middleware';
 import { database } from '../services/database.service';
 
+const NODE_ENV = process.env.NODE_ENV || 'development';
+
 // Load users from database
 let users: any[] = [];
 
@@ -97,8 +99,11 @@ const loadUsers = async () => {
 const saveUsers = async () => {
   try {
     await database.users.write(users);
-  } catch (error) {
-    console.error('Error saving users:', error);
+    console.log(`✅ Users saved successfully. Total users: ${users.length}`);
+  } catch (error: any) {
+    console.error('❌ Error saving users:', error);
+    console.error('❌ Error details:', error.message);
+    throw error; // Re-throw to let callers know save failed
   }
 };
 
@@ -163,7 +168,19 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     users.push(newUser);
 
     // Save to database
-    await saveUsers();
+    try {
+      await saveUsers();
+      console.log(`✅ New user registered: ${newUser.email} (ID: ${newUser.id})`);
+    } catch (error: any) {
+      console.error(`❌ Failed to save user ${newUser.email} to database:`, error);
+      // Remove user from memory if save failed
+      users.pop();
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to save user. Please try again or contact support.',
+        error: NODE_ENV === 'development' ? error.message : undefined,
+      });
+    }
 
     // Don't send password in response
     const { password: _, ...userResponse } = newUser;
