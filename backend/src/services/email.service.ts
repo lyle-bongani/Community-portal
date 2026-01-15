@@ -202,19 +202,37 @@ const sendEmailViaAPI = async (options: EmailOptions): Promise<boolean> => {
       });
     } else if (emailService === 'resend') {
       // Resend API
+      // Extract reply-to email if specified, otherwise use SMTP_FROM
+      const replyToEmail = process.env.REPLY_TO_EMAIL || process.env.SMTP_FROM;
+      const replyToMatch = replyToEmail ? (replyToEmail.match(/<(.+)>/) || replyToEmail.match(/(\S+@\S+)/)) : null;
+      const replyToAddress = replyToMatch ? replyToMatch[1] : null;
+      
+      // Use Resend's default domain for "from" (required), but set reply-to to Gmail
+      const resendFrom = fromAddress.includes('@gmail.com') 
+        ? 'onboarding@resend.dev' // Resend requires verified domain, use default
+        : fromAddress;
+      
+      const emailPayload: any = {
+        from: resendFrom,
+        to: options.to,
+        subject: options.subject,
+        html: options.html,
+        text: options.text || options.html.replace(/<[^>]*>/g, ''),
+      };
+      
+      // Add reply-to if different from "from" address
+      if (replyToAddress && replyToAddress !== resendFrom) {
+        emailPayload.reply_to = replyToAddress;
+        console.log('📧 Reply-To set to:', replyToAddress);
+      }
+      
       response = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${apiKey}`,
         },
-        body: JSON.stringify({
-          from: fromAddress,
-          to: options.to,
-          subject: options.subject,
-          html: options.html,
-          text: options.text || options.html.replace(/<[^>]*>/g, ''),
-        }),
+        body: JSON.stringify(emailPayload),
       });
     } else if (emailService === 'mailgun') {
       // Mailgun API
