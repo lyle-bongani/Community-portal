@@ -45,7 +45,8 @@ const createTransporter = () => {
     transporter.verify((error) => {
       if (error) {
         console.error('❌ SMTP Connection verification failed:', error.message);
-        if (error.code === 'ETIMEDOUT' || error.code === 'ECONNREFUSED') {
+        const errorCode = (error as any).code;
+        if (errorCode === 'ETIMEDOUT' || errorCode === 'ECONNREFUSED') {
           console.error('❌ This is likely because Render blocks SMTP ports on free tier');
           console.error('❌ Switch to API-based email service (SendGrid, Mailgun, Resend)');
         }
