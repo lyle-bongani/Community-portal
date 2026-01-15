@@ -3,3 +3,9 @@ dist
 .env
 *.log
 data/
+
+# Documentation files (keep only README.md)
+EMAIL_TROUBLESHOOTING.md
+MIGRATION_GUIDE.md
+RENDER_FIX_GUIDE.md
+RENDER_SETUP.md

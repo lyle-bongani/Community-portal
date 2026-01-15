@@ -21,7 +21,7 @@ const createTransporter = () => {
     });
     
     // Verify connection on creation
-    transporter.verify((error, success) => {
+    transporter.verify((error) => {
       if (error) {
         console.error('❌ SMTP Connection verification failed:', error.message);
         console.error('❌ Full error:', error);
