@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { hashPassword, comparePassword } from '../utils/password.util';
 import { generateToken } from '../middleware/auth.middleware';
 import { database } from '../services/database.service';
+import { sendWelcomeEmail } from '../services/email.service';
 
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
@@ -198,9 +199,20 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       isAdmin: isAdminUser,
     });
 
+    // Send welcome email asynchronously (don't wait for it)
+    console.log('📧 Sending welcome email to:', newUser.email);
+    sendWelcomeEmail(newUser.email, newUser.name)
+      .then((result) => {
+        console.log('📧 Welcome email result:', result ? 'Success' : 'Failed');
+      })
+      .catch((error) => {
+        console.error('📧 Welcome email error:', error);
+        // Don't fail the request if email fails (notifications are optional)
+      });
+
     res.status(201).json({
       success: true,
-      message: 'User registered successfully',
+      message: 'User registered successfully. Welcome email sent.',
       data: userResponse,
       token, // Include token in response
     });

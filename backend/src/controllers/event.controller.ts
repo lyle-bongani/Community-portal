@@ -260,6 +260,13 @@ export const registerForEvent = async (req: AuthRequest, res: Response, next: Ne
       });
     }
 
+    // Verify we have the correct user
+    console.log('📧 Event registration - User verification:');
+    console.log('📧 Request userId:', userId);
+    console.log('📧 Found user ID:', user.id);
+    console.log('📧 Found user email:', user.email);
+    console.log('📧 Found user name:', user.name);
+
     // Check if this is the user's first event registration
     // Count how many events the user is already registered for (excluding current event)
     const userEventRegistrations = events.filter(e => 
@@ -283,26 +290,36 @@ export const registerForEvent = async (req: AuthRequest, res: Response, next: Ne
 
     // Send email notification asynchronously (don't wait for it)
     console.log('📧 Starting email notification...');
-    console.log('📧 User email:', user.email);
+    console.log('📧 Sending email to:', user.email);
+    console.log('📧 Recipient name:', user.name);
+    console.log('📧 Event:', event.title);
     console.log('📧 Is first-time registration:', isFirstTimeRegistration);
     
-    // Send email confirmation (with special message for first-time registrations)
-    sendEventRegistrationEmail(
-      user.email,
-      user.name,
-      event.title,
-      event.date,
-      event.location,
-      isFirstTimeRegistration
-    ).then((result) => {
-      console.log('📧 Email notification result:', result ? 'Success' : 'Failed');
-      if (isFirstTimeRegistration) {
-        console.log('🎉 First-time registration email sent!');
-      }
-    }).catch((error) => {
-      console.error('📧 Email notification error:', error);
-      // Don't fail the request if email fails (notifications are optional)
-    });
+    // Verify email address before sending
+    if (!user.email || !user.email.includes('@')) {
+      console.error('❌ Invalid email address for user:', user.id, user.email);
+      console.error('❌ Email will not be sent');
+    } else {
+      // Send email confirmation (with special message for first-time registrations)
+      sendEventRegistrationEmail(
+        user.email, // Ensure we're using the correct user's email
+        user.name,
+        event.title,
+        event.date,
+        event.location,
+        isFirstTimeRegistration
+      ).then((result) => {
+        console.log('📧 Email notification result:', result ? 'Success' : 'Failed');
+        console.log('📧 Email was sent to:', user.email);
+        if (isFirstTimeRegistration) {
+          console.log('🎉 First-time registration email sent!');
+        }
+      }).catch((error) => {
+        console.error('📧 Email notification error:', error);
+        console.error('📧 Failed to send email to:', user.email);
+        // Don't fail the request if email fails (notifications are optional)
+      });
+    }
 
     res.status(200).json({
       success: true,

@@ -242,3 +242,65 @@ export const sendEventRegistrationEmail = async (
     html,
   });
 };
+
+export const sendWelcomeEmail = async (
+  userEmail: string,
+  userName: string
+): Promise<boolean> => {
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #7BA09F 0%, #6a8f8e 100%); color: white; padding: 40px; text-align: center; border-radius: 5px 5px 0 0; }
+        .welcome-badge { background-color: #D9191C; color: white; padding: 10px 20px; border-radius: 25px; display: inline-block; margin-bottom: 20px; font-size: 16px; font-weight: bold; }
+        .content { background-color: #f9f9f9; padding: 40px; border-radius: 0 0 5px 5px; }
+        .welcome-message { background: linear-gradient(135deg, #f0f9f9 0%, #e8f5f5 100%); padding: 25px; border-radius: 8px; margin-bottom: 25px; border: 2px solid #7BA09F; }
+        .features { background-color: white; padding: 20px; margin: 20px 0; border-left: 4px solid #7BA09F; border-radius: 4px; }
+        .button { display: inline-block; background-color: #7BA09F; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin-top: 20px; }
+        .footer { text-align: center; margin-top: 30px; color: #666; font-size: 12px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <div class="welcome-badge">🎉 WELCOME! 🎉</div>
+          <h1>Welcome to Community Portal</h1>
+        </div>
+        <div class="content">
+          <div class="welcome-message">
+            <p style="font-size: 20px; font-weight: bold; color: #7BA09F; margin-bottom: 15px;">Hello ${userName}!</p>
+            <p style="margin: 0; font-size: 16px;">We're thrilled to have you join our community! Your account has been successfully created.</p>
+          </div>
+          <p>Thank you for registering with Community Portal. You're now part of an amazing community where you can:</p>
+          <div class="features">
+            <h3 style="color: #7BA09F; margin-top: 0;">What you can do:</h3>
+            <ul>
+              <li><strong>Create and share posts</strong> with the community</li>
+              <li><strong>Discover and register</strong> for exciting events</li>
+              <li><strong>Connect and interact</strong> with other members</li>
+              <li><strong>Stay updated</strong> with real-time notifications</li>
+            </ul>
+          </div>
+          <p>Get started by exploring your dashboard and checking out upcoming events!</p>
+          <p>If you have any questions or need help, feel free to reach out to us.</p>
+          <p style="margin-top: 30px;">Welcome aboard!</p>
+          <p style="margin: 0;"><strong>The Community Portal Team</strong></p>
+        </div>
+        <div class="footer">
+          <p>Community Portal - Bringing communities together</p>
+          <p style="margin-top: 10px; font-size: 11px; color: #999;">This is an automated message. Please do not reply to this email.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  return sendEmail({
+    to: userEmail,
+    subject: '🎉 Welcome to Community Portal!',
+    html,
+  });
+};
