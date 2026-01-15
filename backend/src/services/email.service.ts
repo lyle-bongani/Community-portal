@@ -1,15 +1,32 @@
 import nodemailer from 'nodemailer';
 
 // Email service configuration
-// For development, we'll use a fake SMTP or console logging
-// In production, configure with real SMTP credentials
+// NOTE: Render free tier blocks SMTP ports (25, 465, 587)
+// For Render, use API-based email services (SendGrid, Mailgun, Resend) or upgrade to paid plan
+// For local development, SMTP works fine
 
 const createTransporter = () => {
-  // Production mode - use real SMTP (only if SMTP_HOST is configured)
+  // Check if using API-based email service (for Render free tier)
+  if (process.env.EMAIL_API_KEY && process.env.EMAIL_API_URL) {
+    // Use API-based email service (SendGrid, Mailgun, Resend, etc.)
+    // This works on Render free tier since it uses HTTPS, not SMTP ports
+    return null; // Will use fetch API instead
+  }
+
+  // Use SMTP (works locally, but blocked on Render free tier)
   if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+    const port = parseInt(process.env.SMTP_PORT || '587');
+    
+    // Warn if using blocked ports on Render
+    if (process.env.NODE_ENV === 'production' && [25, 465, 587].includes(port)) {
+      console.warn('⚠️  WARNING: SMTP ports 25, 465, and 587 are BLOCKED on Render free tier!');
+      console.warn('⚠️  Emails will NOT work. Use an API-based email service instead.');
+      console.warn('⚠️  Options: SendGrid, Mailgun, Resend, or upgrade Render plan');
+    }
+    
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
-      port: parseInt(process.env.SMTP_PORT || '587'),
+      port: port,
       secure: process.env.SMTP_SECURE === 'true',
       auth: {
         user: process.env.SMTP_USER,
@@ -18,13 +35,20 @@ const createTransporter = () => {
       // Add debug logging
       debug: process.env.NODE_ENV === 'development',
       logger: process.env.NODE_ENV === 'development',
+      // Add connection timeout for Render
+      connectionTimeout: 10000, // 10 seconds
+      greetingTimeout: 10000,
+      socketTimeout: 10000,
     });
     
-    // Verify connection on creation
+    // Verify connection on creation (async, don't wait)
     transporter.verify((error) => {
       if (error) {
         console.error('❌ SMTP Connection verification failed:', error.message);
-        console.error('❌ Full error:', error);
+        if (error.code === 'ETIMEDOUT' || error.code === 'ECONNREFUSED') {
+          console.error('❌ This is likely because Render blocks SMTP ports on free tier');
+          console.error('❌ Switch to API-based email service (SendGrid, Mailgun, Resend)');
+        }
       } else {
         console.log('✅ SMTP Connection verified successfully');
       }
@@ -33,7 +57,7 @@ const createTransporter = () => {
     return transporter;
   }
 
-  // Development mode - return null (we'll just log instead)
+  // No email configuration - return null (we'll just log instead)
   return null;
 };
 
@@ -45,18 +69,25 @@ export interface EmailOptions {
 }
 
 export const sendEmail = async (options: EmailOptions): Promise<boolean> => {
+  // Check if using API-based email service (for Render free tier)
+  if (process.env.EMAIL_API_KEY && process.env.EMAIL_API_URL) {
+    return sendEmailViaAPI(options);
+  }
+
   const transporter = createTransporter();
   
-  // If no SMTP configured (development mode), just log the email
+  // If no email configured, just log the email
   if (!transporter) {
-    console.log('\n📧 ===== EMAIL NOTIFICATION (DEV MODE - NOT SENT) =====');
+    console.log('\n📧 ===== EMAIL NOTIFICATION (NOT CONFIGURED - NOT SENT) =====');
     console.log('📧 To:', options.to);
     console.log('📧 Subject:', options.subject);
     const textContent = options.text || options.html.replace(/<[^>]*>/g, '');
     console.log('📧 Content Preview:', textContent.substring(0, 300) + (textContent.length > 300 ? '...' : ''));
     console.log('📧 ====================================================\n');
-    console.log('💡 To enable real email sending, configure SMTP settings in .env file');
-    return true; // Return true in dev mode to not break the flow
+    console.log('💡 To enable email sending:');
+    console.log('   - For Render free tier: Use API-based service (EMAIL_API_KEY, EMAIL_API_URL)');
+    console.log('   - For local/paid Render: Configure SMTP settings (SMTP_HOST, SMTP_USER, SMTP_PASS)');
+    return true; // Return true to not break the flow
   }
 
   try {
@@ -105,23 +136,120 @@ export const sendEmail = async (options: EmailOptions): Promise<boolean> => {
     console.error('❌ Error command:', error.command);
     console.error('❌ Full error:', JSON.stringify(error, null, 2));
     
-    // Common Gmail errors
+    // Common errors
     if (error.code === 'EAUTH') {
       console.error('❌ Authentication failed! Check:');
       console.error('   - SMTP_USER is correct');
       console.error('   - SMTP_PASS is the App Password (not regular password)');
       console.error('   - 2-Factor Authentication is enabled on Gmail');
       console.error('   - App Password was generated correctly');
-    } else if (error.code === 'ECONNECTION') {
-      console.error('❌ Connection failed! Check:');
-      console.error('   - SMTP_HOST is correct (smtp.gmail.com)');
-      console.error('   - SMTP_PORT is correct (587)');
-      console.error('   - Firewall/network allows SMTP connections');
+    } else if (error.code === 'ECONNECTION' || error.code === 'ETIMEDOUT' || error.code === 'ECONNREFUSED') {
+      console.error('❌ Connection failed! This is likely because:');
+      console.error('   - Render free tier BLOCKS SMTP ports (25, 465, 587)');
+      console.error('   - Solution: Use API-based email service (SendGrid, Mailgun, Resend)');
+      console.error('   - Or upgrade Render to paid plan to unblock SMTP ports');
     } else if (error.responseCode) {
       console.error('❌ SMTP Server Error:', error.responseCode, error.response);
     }
     
     // Don't fail the request if email fails (notifications are optional)
+    return false;
+  }
+};
+
+// Send email via API (for Render free tier - uses HTTPS, not SMTP)
+const sendEmailViaAPI = async (options: EmailOptions): Promise<boolean> => {
+  try {
+    const apiKey = process.env.EMAIL_API_KEY;
+    const emailService = process.env.EMAIL_SERVICE || 'sendgrid'; // sendgrid, mailgun, resend
+    
+    if (!apiKey) {
+      console.error('❌ EMAIL_API_KEY not configured');
+      return false;
+    }
+
+    console.log('📧 Sending email via API (Render-compatible)...');
+    console.log('📧 Service:', emailService);
+    console.log('📧 To:', options.to);
+    console.log('📧 Subject:', options.subject);
+
+    const fromEmail = process.env.SMTP_FROM || 'Community Portal <noreply@communityportal.com>';
+    const fromMatch = fromEmail.match(/<(.+)>/) || fromEmail.match(/(\S+@\S+)/);
+    const fromAddress = fromMatch ? fromMatch[1] : fromEmail;
+
+    let response: Response;
+    
+    if (emailService === 'sendgrid') {
+      // SendGrid API
+      response = await fetch('https://api.sendgrid.com/v3/mail/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          personalizations: [{
+            to: [{ email: options.to }],
+            subject: options.subject,
+          }],
+          from: { email: fromAddress },
+          content: [
+            { type: 'text/html', value: options.html },
+            ...(options.text ? [{ type: 'text/plain', value: options.text }] : []),
+          ],
+        }),
+      });
+    } else if (emailService === 'resend') {
+      // Resend API
+      response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          from: fromAddress,
+          to: options.to,
+          subject: options.subject,
+          html: options.html,
+          text: options.text || options.html.replace(/<[^>]*>/g, ''),
+        }),
+      });
+    } else if (emailService === 'mailgun') {
+      // Mailgun API
+      const mailgunDomain = process.env.MAILGUN_DOMAIN || 'your-domain.com';
+      const authString = Buffer.from(`api:${apiKey}`).toString('base64');
+      response = await fetch(`https://api.mailgun.net/v3/${mailgunDomain}/messages`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Basic ${authString}`,
+        },
+        body: new URLSearchParams({
+          from: fromAddress,
+          to: options.to,
+          subject: options.subject,
+          html: options.html,
+          text: options.text || options.html.replace(/<[^>]*>/g, ''),
+        }),
+      });
+    } else {
+      console.error('❌ Unknown email service:', emailService);
+      console.error('❌ Supported services: sendgrid, resend, mailgun');
+      return false;
+    }
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Email API request failed:', response.status, errorText);
+      return false;
+    }
+
+    const result = await response.json().catch(() => ({}));
+    console.log('✅ Email sent via API successfully');
+    console.log('📧 Response:', result);
+    return true;
+  } catch (error: any) {
+    console.error('❌ Email API request failed:', error.message);
     return false;
   }
 };
