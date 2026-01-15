@@ -182,23 +182,43 @@ const sendEmailViaAPI = async (options: EmailOptions): Promise<boolean> => {
     
     if (emailService === 'sendgrid') {
       // SendGrid API
+      // SendGrid requires verified sender - use verified email or default
+      // Extract verified sender from SMTP_FROM or use a default
+      let sendgridFrom = fromAddress;
+      
+      // If using Gmail address, SendGrid needs it verified or use a default
+      // For now, try to use the email but it must be verified in SendGrid dashboard
+      // If verification fails, user needs to verify sender in SendGrid
+      
+      const emailPayload = {
+        personalizations: [{
+          to: [{ email: options.to }],
+          subject: options.subject,
+        }],
+        from: { email: sendgridFrom },
+        content: [
+          { type: 'text/html', value: options.html },
+          ...(options.text ? [{ type: 'text/plain', value: options.text }] : []),
+        ],
+      };
+      
+      // Add reply-to if different from from address
+      const replyToEmail = process.env.REPLY_TO_EMAIL;
+      if (replyToEmail && replyToEmail !== sendgridFrom) {
+        const replyToMatch = replyToEmail.match(/<(.+)>/) || replyToEmail.match(/(\S+@\S+)/);
+        if (replyToMatch) {
+          emailPayload.reply_to = { email: replyToMatch[1] };
+          console.log('📧 Reply-To set to:', replyToMatch[1]);
+        }
+      }
+      
       response = await fetch('https://api.sendgrid.com/v3/mail/send', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${apiKey}`,
         },
-        body: JSON.stringify({
-          personalizations: [{
-            to: [{ email: options.to }],
-            subject: options.subject,
-          }],
-          from: { email: fromAddress },
-          content: [
-            { type: 'text/html', value: options.html },
-            ...(options.text ? [{ type: 'text/plain', value: options.text }] : []),
-          ],
-        }),
+        body: JSON.stringify(emailPayload),
       });
     } else if (emailService === 'resend') {
       // Resend API
