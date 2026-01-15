@@ -190,7 +190,7 @@ const sendEmailViaAPI = async (options: EmailOptions): Promise<boolean> => {
       // For now, try to use the email but it must be verified in SendGrid dashboard
       // If verification fails, user needs to verify sender in SendGrid
       
-      const emailPayload = {
+      const emailPayload: any = {
         personalizations: [{
           to: [{ email: options.to }],
           subject: options.subject,
