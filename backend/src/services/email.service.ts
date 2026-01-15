@@ -7,7 +7,7 @@ import nodemailer from 'nodemailer';
 const createTransporter = () => {
   // Production mode - use real SMTP (only if SMTP_HOST is configured)
   if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
-    return nodemailer.createTransport({
+    const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: parseInt(process.env.SMTP_PORT || '587'),
       secure: process.env.SMTP_SECURE === 'true',
@@ -15,7 +15,22 @@ const createTransporter = () => {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
+      // Add debug logging
+      debug: process.env.NODE_ENV === 'development',
+      logger: process.env.NODE_ENV === 'development',
     });
+    
+    // Verify connection on creation
+    transporter.verify((error, success) => {
+      if (error) {
+        console.error('❌ SMTP Connection verification failed:', error.message);
+        console.error('❌ Full error:', error);
+      } else {
+        console.log('✅ SMTP Connection verified successfully');
+      }
+    });
+    
+    return transporter;
   }
 
   // Development mode - return null (we'll just log instead)
@@ -53,10 +68,25 @@ export const sendEmail = async (options: EmailOptions): Promise<boolean> => {
       html: options.html,
     };
 
+    console.log('📧 Attempting to send email...');
+    console.log('📧 From:', mailOptions.from);
+    console.log('📧 To:', mailOptions.to);
+    console.log('📧 Subject:', mailOptions.subject);
+    
     const info = await transporter.sendMail(mailOptions);
     
-    console.log('📧 Email sent successfully to:', options.to);
+    console.log('✅ Email accepted by SMTP server');
     console.log('📧 Message ID:', info.messageId);
+    console.log('📧 Response:', info.response);
+    
+    // Log additional info for Gmail
+    if (process.env.SMTP_HOST === 'smtp.gmail.com') {
+      console.log('📧 Gmail SMTP: Email accepted. Check recipient inbox and spam folder.');
+      console.log('📧 Note: Gmail may delay or block emails if:');
+      console.log('   - Sending to many recipients quickly');
+      console.log('   - Email content triggers spam filters');
+      console.log('   - App password is incorrect or expired');
+    }
     
     // If using Ethereal Email, show preview URL
     if (process.env.SMTP_HOST === 'smtp.ethereal.email' && nodemailer.getTestMessageUrl) {
@@ -69,7 +99,28 @@ export const sendEmail = async (options: EmailOptions): Promise<boolean> => {
     
     return true;
   } catch (error: any) {
-    console.error('❌ Email sending failed:', error.message);
+    console.error('❌ Email sending failed!');
+    console.error('❌ Error message:', error.message);
+    console.error('❌ Error code:', error.code);
+    console.error('❌ Error command:', error.command);
+    console.error('❌ Full error:', JSON.stringify(error, null, 2));
+    
+    // Common Gmail errors
+    if (error.code === 'EAUTH') {
+      console.error('❌ Authentication failed! Check:');
+      console.error('   - SMTP_USER is correct');
+      console.error('   - SMTP_PASS is the App Password (not regular password)');
+      console.error('   - 2-Factor Authentication is enabled on Gmail');
+      console.error('   - App Password was generated correctly');
+    } else if (error.code === 'ECONNECTION') {
+      console.error('❌ Connection failed! Check:');
+      console.error('   - SMTP_HOST is correct (smtp.gmail.com)');
+      console.error('   - SMTP_PORT is correct (587)');
+      console.error('   - Firewall/network allows SMTP connections');
+    } else if (error.responseCode) {
+      console.error('❌ SMTP Server Error:', error.responseCode, error.response);
+    }
+    
     // Don't fail the request if email fails (notifications are optional)
     return false;
   }

@@ -76,6 +76,28 @@ const startServer = async () => {
     console.log('📧 Email service: CONFIGURED (SMTP enabled)');
     console.log(`📧 SMTP Host: ${process.env.SMTP_HOST}`);
     console.log(`📧 SMTP User: ${process.env.SMTP_USER}`);
+    console.log(`📧 SMTP Port: ${process.env.SMTP_PORT || '587'}`);
+    console.log(`📧 SMTP From: ${process.env.SMTP_FROM || 'Community Portal <noreply@communityportal.com>'}`);
+    
+    // Verify SMTP connection
+    try {
+      const nodemailer = await import('nodemailer');
+      const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: parseInt(process.env.SMTP_PORT || '587'),
+        secure: process.env.SMTP_SECURE === 'true',
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      });
+      
+      await transporter.verify();
+      console.log('✅ SMTP connection verified successfully');
+    } catch (error: any) {
+      console.error('❌ SMTP connection verification failed:', error.message);
+      console.error('❌ Check your SMTP credentials in environment variables');
+    }
   } else {
     console.log('📧 Email service: NOT CONFIGURED (emails will be logged only)');
     console.log('💡 To enable email sending, set SMTP_HOST, SMTP_USER, and SMTP_PASS environment variables');
