@@ -3,7 +3,14 @@ import path from 'path';
 
 // Database directory - use environment variable or default to 'data' in project root
 // For Render, you can set DATA_DIR to a persistent path or use Render's disk storage
-const DB_DIR = process.env.DATA_DIR || path.join(process.cwd(), 'data');
+// If DATA_DIR is set to /persistent/data but persistent disk isn't mounted, fallback to project directory
+let DB_DIR = process.env.DATA_DIR || path.join(process.cwd(), 'data');
+
+// If using /persistent path but it doesn't exist, fallback to project directory
+if (DB_DIR.startsWith('/persistent') && !fs.existsSync('/persistent')) {
+  console.warn('⚠️  Persistent disk not mounted at /persistent, using project directory instead');
+  DB_DIR = path.join(process.cwd(), 'data');
+}
 const USERS_FILE = path.join(DB_DIR, 'users.json');
 const POSTS_FILE = path.join(DB_DIR, 'posts.json');
 const EVENTS_FILE = path.join(DB_DIR, 'events.json');
