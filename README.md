@@ -341,7 +341,17 @@ curl http://localhost:5000/api
 
 #### 3. Test Admin Login
 
-**Local Testing:**
+**PowerShell (Windows) - Local:**
+```powershell
+$body = @{ email = "admin@gmail.com"; password = "admin123" } | ConvertTo-Json; Invoke-RestMethod -Uri "http://localhost:5000/api/v1/auth/login" -Method POST -ContentType "application/json" -Body $body
+```
+
+**PowerShell (Windows) - Server:**
+```powershell
+$body = @{ email = "admin@gmail.com"; password = "admin123" } | ConvertTo-Json; Invoke-RestMethod -Uri "https://community-portal-9uek.onrender.com/api/v1/auth/login" -Method POST -ContentType "application/json" -Body $body
+```
+
+**Git Bash / Linux / Mac (use curl) - Local:**
 ```bash
 curl -X POST http://localhost:5000/api/v1/auth/login \
   -H "Content-Type: application/json" \
@@ -351,7 +361,7 @@ curl -X POST http://localhost:5000/api/v1/auth/login \
   }'
 ```
 
-**Server Testing:**
+**Git Bash / Linux / Mac (use curl) - Server:**
 ```bash
 curl -X POST https://community-portal-9uek.onrender.com/api/v1/auth/login \
   -H "Content-Type: application/json" \
@@ -363,17 +373,12 @@ curl -X POST https://community-portal-9uek.onrender.com/api/v1/auth/login \
 
 #### 4. Test Protected Endpoints
 
-**Local Testing:**
 ```bash
 curl -X GET http://localhost:5000/api/v1/users/me \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
-**Server Testing:**
-```bash
-curl -X GET https://community-portal-9uek.onrender.com/api/v1/users/me \
-  -H "Authorization: Bearer YOUR_TOKEN_HERE"
-```
+Replace `YOUR_TOKEN_HERE` with the token received from login.
 
 #### 5. Test WebSocket Connection
 
@@ -517,7 +522,6 @@ The application includes robust data persistence features:
 
 ### Backend
 - The backend uses JSON file storage for simplicity. For production, consider migrating to a database (MongoDB, PostgreSQL, etc.)
-- Profile images are stored as base64 strings. For production, consider using cloud storage (AWS S3, Cloudinary, etc.)
 - WebSocket connections are managed via Socket.IO for real-time features
 
 ### Frontend
@@ -527,9 +531,6 @@ The application includes robust data persistence features:
   - Backend URL: `https://community-portal-9uek.onrender.com`
   - Default API URL: `https://community-portal-9uek.onrender.com/api/v1`
   - Default WebSocket URL: `https://community-portal-9uek.onrender.com`
-  - Can be overridden by setting `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_WS_URL` in Vercel environment variables
-- Profile images are stored as base64 strings (consider cloud storage for production)
-- WebSocket connection is established automatically on app load
 - LocalStorage is used for session management (consider more secure options for production)
 
 ## Production Deployment

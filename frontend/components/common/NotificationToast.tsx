@@ -24,7 +24,7 @@ export default function NotificationToast() {
   if (visibleNotifications.length === 0) return null;
 
   return (
-    <div className="fixed top-4 right-4 z-50 space-y-2">
+    <div className="fixed top-4 right-4 z-[100] space-y-2">
       {visibleNotifications.map((notification, index) => (
         <div
           key={`${notification.timestamp}-${index}`}

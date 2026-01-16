@@ -292,8 +292,29 @@ Expected response:
 
 Login as admin:
 
+**PowerShell (Windows) - Local:**
+```powershell
+$body = @{ email = "admin@gmail.com"; password = "admin123" } | ConvertTo-Json; Invoke-RestMethod -Uri "http://localhost:5000/api/v1/auth/login" -Method POST -ContentType "application/json" -Body $body
+```
+
+**PowerShell (Windows) - Server:**
+```powershell
+$body = @{ email = "admin@gmail.com"; password = "admin123" } | ConvertTo-Json; Invoke-RestMethod -Uri "https://community-portal-9uek.onrender.com/api/v1/auth/login" -Method POST -ContentType "application/json" -Body $body
+```
+
+**Git Bash / Linux / Mac (use curl) - Local:**
 ```bash
 curl -X POST http://localhost:5000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "admin@gmail.com",
+    "password": "admin123"
+  }'
+```
+
+**Git Bash / Linux / Mac (use curl) - Server:**
+```bash
+curl -X POST https://community-portal-9uek.onrender.com/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "admin@gmail.com",
@@ -545,7 +566,6 @@ Set `DATA_DIR` environment variable to specify where data should be stored:
 ## Notes
 
 - The backend uses JSON file storage for simplicity. For production, consider migrating to a database (MongoDB, PostgreSQL, etc.)
-- Profile images are stored as base64 strings. For production, consider using cloud storage (AWS S3, Cloudinary, etc.)
 - WebSocket connections are managed via Socket.IO for real-time features
 - Data persistence is handled automatically with fallback mechanisms for different deployment environments
 - Default events are created automatically on first run if the events file doesn't exist

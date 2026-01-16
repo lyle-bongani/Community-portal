@@ -425,8 +425,5 @@ Default admin account for testing:
   - Backend URL: `https://community-portal-9uek.onrender.com`
   - Default API URL: `https://community-portal-9uek.onrender.com/api/v1`
   - Default WebSocket URL: `https://community-portal-9uek.onrender.com`
-  - Can be overridden by setting `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_WS_URL` in Vercel environment variables
-- Profile images are stored as base64 strings (consider cloud storage for production)
-- WebSocket connection is established automatically on app load
 - LocalStorage is used for session management (consider more secure options for production)
 - The application is fully responsive and optimized for mobile, tablet, and desktop devices
