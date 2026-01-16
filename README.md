@@ -341,6 +341,7 @@ curl http://localhost:5000/api
 
 #### 3. Test Admin Login
 
+**Local Testing:**
 ```bash
 curl -X POST http://localhost:5000/api/v1/auth/login \
   -H "Content-Type: application/json" \
@@ -350,10 +351,27 @@ curl -X POST http://localhost:5000/api/v1/auth/login \
   }'
 ```
 
+**Server Testing:**
+```bash
+curl -X POST https://community-portal-9uek.onrender.com/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "admin@gmail.com",
+    "password": "admin123"
+  }'
+```
+
 #### 4. Test Protected Endpoints
 
+**Local Testing:**
 ```bash
 curl -X GET http://localhost:5000/api/v1/users/me \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+**Server Testing:**
+```bash
+curl -X GET https://community-portal-9uek.onrender.com/api/v1/users/me \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
@@ -429,6 +447,18 @@ Default admin account for testing:
 
 > **Note**: Admin role is assigned to specific email addresses. Only users with admin email addresses can access admin features.
 
+## API URLs
+
+### Local Development
+- **API URL**: `http://localhost:5000/api/v1`
+- **WebSocket URL**: `http://localhost:5000`
+- **Health Check**: `http://localhost:5000/health`
+
+### Production Server
+- **API URL**: `https://community-portal-9uek.onrender.com/api/v1`
+- **WebSocket URL**: `https://community-portal-9uek.onrender.com`
+- **Health Check**: `https://community-portal-9uek.onrender.com/health`
+
 ## WebSocket Events
 
 The server emits the following WebSocket events:
@@ -442,8 +472,20 @@ The server emits the following WebSocket events:
 Data is stored in JSON files in the `backend/data/` directory:
 - `users.json` - User accounts and profiles
 - `posts.json` - All posts
-- `events.json` - All events
+- `events.json` - All events (includes 3 default events on initialization)
 - `comments.json` - All comments
+
+### Data Persistence
+
+The application includes robust data persistence features:
+- **Local Development**: Data is stored in `backend/data/` directory
+- **Production (Render)**: Supports persistent disk storage at `/persistent/data` or `/opt/render/project/src/backend/data`
+- **Automatic Fallback**: If persistent disk is not available, falls back to project directory
+- **Atomic Writes**: All data writes are atomic to prevent corruption
+- **Default Events**: System initializes with 3 default events if none exist:
+  1. Community Meetup
+  2. Tech Workshop: Web Development Basics
+  3. Annual Community Festival
 
 ## Security Features
 
@@ -480,11 +522,12 @@ Data is stored in JSON files in the `backend/data/` directory:
 
 ### Frontend
 - **Local Development**: The frontend expects the backend to be running on `http://localhost:5000` by default
-- **Production**: Defaults to Render backend URL (`https://community-portal-9uek.onrender.com`)
-  - Frontend is deployed at: `https://www.communityportal.online`
-  - Can be overridden by setting `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_WS_URL` in Vercel environment variables
+- **Production**: 
+  - Frontend URL: `https://www.communityportal.online`
+  - Backend URL: `https://community-portal-9uek.onrender.com`
   - Default API URL: `https://community-portal-9uek.onrender.com/api/v1`
   - Default WebSocket URL: `https://community-portal-9uek.onrender.com`
+  - Can be overridden by setting `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_WS_URL` in Vercel environment variables
 - Profile images are stored as base64 strings (consider cloud storage for production)
 - WebSocket connection is established automatically on app load
 - LocalStorage is used for session management (consider more secure options for production)

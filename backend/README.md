@@ -202,7 +202,9 @@ npm start
 
 The server will start on `http://localhost:5000` (or the port specified in your `.env` file).
 
-**Production URL**: `https://community-portal-9uek.onrender.com`
+**Production URLs**:
+- Backend: `https://community-portal-9uek.onrender.com`
+- Frontend: `https://www.communityportal.online`
 
 **Note**: For production deployment, update `CORS_ORIGIN` in your `.env` file to include your frontend URL (e.g., `https://www.communityportal.online`). You can also set multiple origins separated by commas.
 
@@ -472,7 +474,20 @@ Default admin account for testing:
 - **Email**: `admin@gmail.com`
 - **Password**: `admin123`
 
+
 > **Note**: Admin role is assigned to specific email addresses. Only users with admin email addresses can access admin features.
+
+## API URLs
+
+### Local Development
+- **API URL**: `http://localhost:5000/api/v1`
+- **WebSocket URL**: `http://localhost:5000`
+- **Health Check**: `http://localhost:5000/health`
+
+### Production Server
+- **API URL**: `https://community-portal-9uek.onrender.com/api/v1`
+- **WebSocket URL**: `https://community-portal-9uek.onrender.com`
+- **Health Check**: `https://community-portal-9uek.onrender.com/health`
 
 ## WebSocket Events
 
@@ -487,8 +502,27 @@ The server emits the following WebSocket events:
 Data is stored in JSON files in the `data/` directory:
 - `users.json` - User accounts and profiles
 - `posts.json` - All posts
-- `events.json` - All events
+- `events.json` - All events (includes 3 default events on initialization)
 - `comments.json` - All comments
+
+### Data Persistence
+
+The application includes robust data persistence features:
+- **Local Development**: Data is stored in `backend/data/` directory
+- **Production (Render)**: Supports persistent disk storage at `/persistent/data` or `/opt/render/project/src/backend/data`
+- **Automatic Fallback**: If persistent disk is not available, falls back to project directory
+- **Atomic Writes**: All data writes are atomic to prevent corruption
+- **Default Events**: System initializes with 3 default events if none exist:
+  1. Community Meetup - Monthly community gathering
+  2. Tech Workshop: Web Development Basics - Educational workshop
+  3. Annual Community Festival - Large community celebration
+
+### Environment Variable for Data Directory
+
+Set `DATA_DIR` environment variable to specify where data should be stored:
+- Local: `DATA_DIR=./data` (default)
+- Render with persistent disk: `DATA_DIR=/persistent/data`
+- Render without persistent disk: `DATA_DIR=/opt/render/project/src/backend/data`
 
 ## Security Features
 
@@ -513,3 +547,5 @@ Data is stored in JSON files in the `data/` directory:
 - The backend uses JSON file storage for simplicity. For production, consider migrating to a database (MongoDB, PostgreSQL, etc.)
 - Profile images are stored as base64 strings. For production, consider using cloud storage (AWS S3, Cloudinary, etc.)
 - WebSocket connections are managed via Socket.IO for real-time features
+- Data persistence is handled automatically with fallback mechanisms for different deployment environments
+- Default events are created automatically on first run if the events file doesn't exist

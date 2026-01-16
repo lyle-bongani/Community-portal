@@ -240,6 +240,7 @@ NEXT_PUBLIC_WS_URL=http://localhost:5000
 
 # For production (set in Vercel environment variables, or defaults to Render URL)
 # Frontend URL: https://www.communityportal.online
+# Backend URL: https://community-portal-9uek.onrender.com
 # NEXT_PUBLIC_API_URL=https://community-portal-9uek.onrender.com/api/v1
 # NEXT_PUBLIC_WS_URL=https://community-portal-9uek.onrender.com
 ```
@@ -372,7 +373,20 @@ Default admin account for testing:
 - **Email**: `admin@gmail.com`
 - **Password**: `admin123`
 
+
 > **Note**: Admin role is assigned to specific email addresses. Only users with admin email addresses can access the admin dashboard and admin features.
+
+## API URLs
+
+### Local Development
+- **API URL**: `http://localhost:5000/api/v1`
+- **WebSocket URL**: `http://localhost:5000`
+- **Health Check**: `http://localhost:5000/health`
+
+### Production Server
+- **API URL**: `https://community-portal-9uek.onrender.com/api/v1`
+- **WebSocket URL**: `https://community-portal-9uek.onrender.com`
+- **Health Check**: `https://community-portal-9uek.onrender.com/health`
 
 ## Image Handling
 
@@ -408,10 +422,11 @@ Default admin account for testing:
 - **Local Development**: The frontend expects the backend to be running on `http://localhost:5000` by default
 - **Production**: 
   - Frontend URL: `https://www.communityportal.online`
-  - Backend URL: `https://community-portal-9uek.onrender.com` (default)
-  - Can be overridden by setting `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_WS_URL` in Vercel environment variables
+  - Backend URL: `https://community-portal-9uek.onrender.com`
   - Default API URL: `https://community-portal-9uek.onrender.com/api/v1`
   - Default WebSocket URL: `https://community-portal-9uek.onrender.com`
+  - Can be overridden by setting `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_WS_URL` in Vercel environment variables
 - Profile images are stored as base64 strings (consider cloud storage for production)
 - WebSocket connection is established automatically on app load
 - LocalStorage is used for session management (consider more secure options for production)
+- The application is fully responsive and optimized for mobile, tablet, and desktop devices
