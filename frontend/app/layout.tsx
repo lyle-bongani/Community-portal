@@ -12,6 +12,9 @@ export const metadata: Metadata = {
   title: "Community Portal",
   description: "A community portal for posts and events",
   viewport: "width=device-width, initial-scale=1, maximum-scale=5",
+  verification: {
+    google: "2OK88g0e28QgIk6s5iILCneaVQRNfr4NqlIQLfKkRfs",
+  },
   icons: {
     icon: '/icon.png',
     apple: '/icon.png',
